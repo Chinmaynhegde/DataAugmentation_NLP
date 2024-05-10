@@ -5,3 +5,6 @@ WordEmbsAug           :   Action-insert, substitute   ,Leverage word2vec, GloVe 
 BackTranslationAug    :   Action-substitute           ,Leverage two translation models for augmentation
 TfIdfAug              :   Action-insert, substitute   ,Use TF-IDF to find out how word should be augmented
 RandomAug             :   Action-insert, substitute, swap, delete,Apply augmentation randomly
+
+
+next steps: use parrot paraphrase
