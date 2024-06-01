@@ -1,0 +1,3 @@
+streamlit
+indic-nlp-library
+googletrans==4.0.0-rc1
