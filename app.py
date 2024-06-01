@@ -48,7 +48,7 @@ def main():
         "This app performs data augmentation on text input using either synonym substitution or translation-based methods.")
 
     # Text input
-    text = st.text_area("Enter text", "")
+    text = st.text_area("Enter Hindi text", "")
 
     # Select augmentation method
     method = st.selectbox("Choose augmentation method", ["Synonym Substitution", "Translation-Based"])
