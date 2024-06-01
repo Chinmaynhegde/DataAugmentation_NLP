@@ -1,5 +1,4 @@
-!pip install indic-nlp-library
-!pip install googletrans==4.0.0-rc1
+
 import streamlit as st
 from indicnlp.tokenize import indic_tokenize
 from googletrans import Translator
