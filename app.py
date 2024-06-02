@@ -80,9 +80,10 @@ synonym_dict = {
     'वर्तमान': ['अभी', 'मौजूदा', 'प्रेसेंट'],
 }
 
+
 # Function to perform data augmentation by token substitution using synonym dictionary
-def augment_text_with_synonyms(text, synonym_dict):
-    tokens = indic_tokenize.trivial_tokenize(text, lang='hi')
+def augment_text_with_synonyms(text, synonym_dict, lang):
+    tokens = indic_tokenize.trivial_tokenize(text, lang=lang)
     augmented_tokens = []
     for token in tokens:
         # Substitute token with a random synonym if available, else keep the original token
@@ -90,50 +91,54 @@ def augment_text_with_synonyms(text, synonym_dict):
         augmented_tokens.append(augmented_token)
     return ' '.join(augmented_tokens)
 
-# Function to translate text from Hindi to Arabic
-def translate_to_arabic(text):
+# Function to translate text
+def translate_text(text, src_lang, dest_lang):
     translator = Translator()
-    translated_text = translator.translate(text, src='hi', dest='ar')
-    return translated_text.text
-
-# Function to translate text from Arabic to Hindi
-def translate_to_hindi(text):
-    translator = Translator()
-    translated_text = translator.translate(text, src='ar', dest='hi')
+    translated_text = translator.translate(text, src=src_lang, dest=dest_lang)
     return translated_text.text
 
 # Function to sequentially augment text using both synonym substitution and translation-based methods
-def augment_text_sequentially(text, synonym_dict):
+def augment_text_sequentially(text, synonym_dict, src_lang, dest_lang):
     # Augment text with synonym substitution
-    augmented_text_synonym = augment_text_with_synonyms(text, synonym_dict)
-    # Translate augmented text to Arabic
-    arabic_text = translate_to_arabic(augmented_text_synonym)
-    # Translate Arabic text back to Hindi
-    augmented_text_translated = translate_to_hindi(arabic_text)
+    augmented_text_synonym = augment_text_with_synonyms(text, synonym_dict, src_lang)
+    # Translate augmented text to destination language and back to source language
+    dest_text = translate_text(augmented_text_synonym, src_lang=src_lang, dest_lang=dest_lang)
+    augmented_text_translated = translate_text(dest_text, src_lang=dest_lang, dest_lang=src_lang)
     return augmented_text_translated
 
 # Streamlit app
 def main():
     st.title("NLP Data Augmentation for Regional Languages")
 
-    st.write(
-        "This app performs data augmentation on text input using both synonym substitution and translation-based methods.")
+    st.write("This app performs data augmentation on text input using variety of methods like synonym substitution, Backtranslation-based, and Sequential methods.")
 
     # Text input
-    text = st.text_area("Enter Hindi text", "")
+    text = st.text_area("Enter text", "")
+
+    # Select source language
+    input_lang = st.selectbox("Choose input language", ["Hindi", "Kannada", "English"])
+
+    # Select destination language
+    dest_lang = st.selectbox("Choose destination language for back-translation", ["Arabic", "English", "Hindi", "Kannada", "German", "French", "Russian", "Japanese"])
 
     # Select augmentation method
-    method = st.selectbox("Choose augmentation method", ["Synonym Substitution", "Translation-Based", "Sequential"])
+    method = st.selectbox("Choose augmentation method", ["Synonym Substitution", "BackTranslation-Based", "Sequential"])
 
     if st.button("Augment Text"):
+        lang_code = {'Hindi': 'hi', 'Kannada': 'kn', 'English': 'en', 'Arabic': 'ar', 'German': 'de', 'French': 'fr', 'Russian': 'ru', 'Japanese': 'ja'}
+        src_lang = lang_code[input_lang]
+        dest_lang_code = lang_code[dest_lang]
+
+        augmented_text = ""
+
         if method == "Synonym Substitution":
-            augmented_text = augment_text_with_synonyms(text, synonym_dict)
-        elif method == "Translation-Based":
-            # Translate to Arabic and back to Hindi
-            arabic_text = translate_to_arabic(text)
-            augmented_text = translate_to_hindi(arabic_text)
+            augmented_text = augment_text_with_synonyms(text, synonym_dict, src_lang)
+        elif method == "BackTranslation-Based":
+            # Translate to destination language and back to source language
+            dest_text = translate_text(text, src_lang=src_lang, dest_lang=dest_lang_code)
+            augmented_text = translate_text(dest_text, src_lang=dest_lang_code, dest_lang=src_lang)
         elif method == "Sequential":
-            augmented_text = augment_text_sequentially(text, synonym_dict)
+            augmented_text = augment_text_sequentially(text, synonym_dict, src_lang, dest_lang_code)
 
         # Display results
         st.write("Original Text:", text)
